@@ -14,20 +14,6 @@ use Doctrine\ORM\Mapping\OneToMany;
  */
 class ShareGroup
 {
-    /**
-     * One product has many features. This is the inverse side.
-     * @OneToMany(targetEntity="Person", mappedBy="ShareGroup")
-     */
-    private $persons;
-
-
-    public function __construct() {
-        $this->persons = new ArrayCollection();
-    }
-
-
-
-
 
     /**
      * @var int

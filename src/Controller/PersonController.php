@@ -25,6 +25,8 @@ class PersonController extends AbstractController
     {
         $person = $this->getDoctrine()->getRepository(Person::class)
             ->createQueryBuilder('p')
+            ->innerjoin('p.shareGroup','ps')
+            ->select('p','ps')
             ->getQuery()
             ->getArrayResult();
 
