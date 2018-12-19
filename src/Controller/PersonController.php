@@ -37,27 +37,29 @@ class PersonController extends BaseController
     }
 
 
-//    /**
-//     * @Route("/", name="person_new", methods="POST")
-//     */
-//    public function new(Request $request)
-//    {
-//        $data = $request->getContent();
-//
-//        $jsonData = json_decode($data, true);
-//
-//        $em = $this->getDoctrine()->getManager();
-//
-//        $person = new ShareGroup();
-//        $person->setSlug($jsonData["slug"]);
-//        $person->setCreatedAt(new \DateTime());
-//        $person->setClosed(false);
-//
-//        $em->persist($person);
-//        $em->flush();
-//
-//        return $this->json($this->serialize($person));
-//    }
+    /**
+     * @Route("/", name="person_new", methods="POST")
+     */
+    public function new(Request $request)
+    {
+        $data = $request->getContent();
+
+        $jsonData = json_decode($data, true);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $sharegroup = $em->getRepository(ShareGroup::class)->findOneBySlug($jsonData["slug"]);
+
+        $person = new Person();
+        $person->setFirstname($jsonData["firstname"]);
+        $person->setLastname($jsonData["lastname"]);
+        $person->setShareGroup($sharegroup);
+
+        $em->persist($person);
+        $em->flush();
+
+        return $this->json($this->serialize($person));
+    }
 
 
 }

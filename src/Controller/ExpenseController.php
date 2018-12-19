@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\Expense;
+use App\Entity\Person;
 use App\Entity\ShareGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,10 +50,16 @@ class ExpenseController extends BaseController
 
         $em = $this->getDoctrine()->getManager();
 
-        $expense = new ShareGroup();
-        $expense->setSlug($jsonData["slug"]);
+        $category = $this->getDoctrine()->getRepository(Category::class)->find($jsonData["category"]);
+        $person =$this->getDoctrine()->getRepository(Person::class)->find($jsonData["person"]);
+
+        $expense = new Expense();
+        $expense->setTitle($jsonData["title"]);
+        $expense->setCategory($category);
         $expense->setCreatedAt(new \DateTime());
-        $expense->setClosed(false);
+        $expense->setAmount($jsonData["amount"]);
+        $expense->setPerson($person);
+
 
         $em->persist($expense);
         $em->flush();
