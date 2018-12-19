@@ -50,7 +50,9 @@ class ExpenseController extends BaseController
 
         $em = $this->getDoctrine()->getManager();
 
+        /** @var Category $category */
         $category = $this->getDoctrine()->getRepository(Category::class)->find($jsonData["category"]);
+        /** @var Person $person */
         $person =$this->getDoctrine()->getRepository(Person::class)->find($jsonData["person"]);
 
         $expense = new Expense();
@@ -64,7 +66,15 @@ class ExpenseController extends BaseController
         $em->persist($expense);
         $em->flush();
 
-        return $this->json($this->serialize($expense));
+        $exp = $this->getDoctrine()->getRepository(Expense::class)
+            ->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter(':id', $expense->getId())
+            ->getQuery()
+            ->getArrayResult()
+        ;
+
+        return $this->json($exp[0]);
     }
 
 }

@@ -93,7 +93,7 @@ class Expense
     }
 
     /**
-     * @return PersonList
+     * @return Person
      */
     public function getPerson()
     {
@@ -101,7 +101,7 @@ class Expense
     }
 
     /**
-     * @param PersonList $person
+     * @param Person $person
      */
     public function setPerson($person)
     {
