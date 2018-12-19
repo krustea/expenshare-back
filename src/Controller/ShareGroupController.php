@@ -13,20 +13,36 @@ use App\Entity\ShareGroup;
  * @package App\Controller
  * @Route("/sharegroup")
  */
-class ShareGroupController extends AbstractController
+class ShareGroupController extends BaseController
 {
 
     /**
-     * @Route("/", name="share_group", methods="GET")
+     * @Route("/{slug}", name="share_group", methods="GET")
      */
-    public function index(Request $request): Response
-    {$share = $this->getDoctrine()->getRepository(ShareGroup::class)
-        ->createQueryBuilder('s')
-        ->getQuery()
-        ->getArrayResult();
+    public function index(ShareGroup $shareGroup): Response
+    {
+        return $this->json($this->serialize($shareGroup));
+    }
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json($share);
-        }
+    /**
+     * @Route("/", name="sharegroup_new", methods="POST")
+     */
+    public function new(Request $request)
+    {
+        $data = $request->getContent();
+
+        $jsonData = json_decode($data, true);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $sharegroup = new ShareGroup();
+        $sharegroup->setSlug($jsonData["slug"]);
+        $sharegroup->setCreatedAt(new \DateTime());
+        $sharegroup->setClosed(false);
+
+        $em->persist($sharegroup);
+        $em->flush();
+
+        return $this->json($this->serialize($sharegroup));
     }
 }

@@ -14,20 +14,37 @@ use App\Entity\Category;
  * @package App\Controller
  * @Route("/category")
  */
-class CategoryController extends AbstractController
+class CategoryController extends BaseController
 {
     /**
      * @Route("/", name="category", methods="GET")
      */
-    public function index(Request $request): Response
+    public function index(Category $category): Response
     {
-        $category = $this->getDoctrine()->getRepository(Category::class)
-            ->createQueryBuilder('c')
-            ->getQuery()
-            ->getArrayResult();
+        return $this->json($this->serialize($category));
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json($category);
-        }
     }
+
+    /**
+     * @Route("/", name="category_new", methods="POST")
+     */
+    public function new(Request $request)
+    {
+        $data = $request->getContent();
+
+        $jsonData = json_decode($data, true);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $category = new ShareGroup();
+        $category->setSlug($jsonData["slug"]);
+        $category->setCreatedAt(new \DateTime());
+        $category->setClosed(false);
+
+        $em->persist($category);
+        $em->flush();
+
+        return $this->json($this->serialize($category));
+    }
+
 }

@@ -14,20 +14,38 @@ use App\Entity\Debt;
  * @package App\Controller
  * @Route("/debt")
  */
-class DebtController extends AbstractController
+class DebtController extends BaseController
 {
     /**
      * @Route("/", name="debt", methods="GET")
      */
-    public function index(Request $request):Response
+    public function index(Debt $debt):Response
     {
-        $debt = $this->getDoctrine()->getRepository(Debt::class)
-        ->createQueryBuilder('d')
-        ->getQuery()
-        ->getArrayResult();
 
-        if ($request->isXmlHttpRequest()){
-            return $this->json($debt);
-        }
+        return $this->json($this->serialize($debt));
+
     }
+
+    /**
+     * @Route("/", name="debt_new", methods="POST")
+     */
+    public function new(Request $request)
+    {
+        $data = $request->getContent();
+
+        $jsonData = json_decode($data, true);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $debt = new ShareGroup();
+        $debt->setSlug($jsonData["slug"]);
+        $debt->setCreatedAt(new \DateTime());
+        $debt->setClosed(false);
+
+        $em->persist($debt);
+        $em->flush();
+
+        return $this->json($this->serialize($debt));
+    }
+
 }

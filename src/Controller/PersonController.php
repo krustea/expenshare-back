@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Expense;
+use App\Entity\ShareGroup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,25 +15,49 @@ use App\Entity\Person;
  * @package App\Controller
  * @Route("/person")
  */
-class PersonController extends AbstractController
+class PersonController extends BaseController
 {
 
     /**
-     * @Route("/", name="person", methods="GET")
-     * @param \Symfony\Component\HttpFoundation\Response $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("/group/{slug}", name="person", methods="GET")
      */
-    public function index(Request $request) :Response
+    public function index(ShareGroup $shareGroup) :Response
     {
-        $person = $this->getDoctrine()->getRepository(Person::class)
+        $persons = $this->getDoctrine()->getRepository(Person::class)
             ->createQueryBuilder('p')
-            ->innerjoin('p.shareGroup','ps')
-            ->select('p','ps')
+            ->select('p', 'e')
+            ->leftJoin('p.expenses', 'e')
+            ->where('p.shareGroup = :group')
+            ->setParameter(':group', $shareGroup)
             ->getQuery()
-            ->getArrayResult();
+            ->getArrayResult()
+        ;
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json($person);
-        }
+        return $this->json($persons);
     }
+
+
+//    /**
+//     * @Route("/", name="person_new", methods="POST")
+//     */
+//    public function new(Request $request)
+//    {
+//        $data = $request->getContent();
+//
+//        $jsonData = json_decode($data, true);
+//
+//        $em = $this->getDoctrine()->getManager();
+//
+//        $person = new ShareGroup();
+//        $person->setSlug($jsonData["slug"]);
+//        $person->setCreatedAt(new \DateTime());
+//        $person->setClosed(false);
+//
+//        $em->persist($person);
+//        $em->flush();
+//
+//        return $this->json($this->serialize($person));
+//    }
+
+
 }
