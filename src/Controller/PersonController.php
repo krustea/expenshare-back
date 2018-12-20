@@ -61,5 +61,21 @@ class PersonController extends BaseController
         return $this->json($this->serialize($person));
     }
 
+    /**
+     * @Route("/", name="person_delete", methods="DELETE")
+     */
+    public function delete(Request $request): Response
+    {
+        $data = $request->getContent();
 
+        $jsonData = json_decode($data, true);
+        $person = $this->getDoctrine()->getRepository(Person::class)->find($jsonData['id']);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($person);
+        $em->flush();
+
+
+        return $this->json(["ok"=>true]);
+    }
 }

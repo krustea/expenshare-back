@@ -26,7 +26,7 @@ class ExpenseController extends BaseController
     {
         $expenses = $this->getDoctrine()->getRepository(Expense::class)
             ->createQueryBuilder('e')
-            ->select('e', 'p')
+            ->select('e', 'p','c')
             ->join('e.person', 'p')
             ->join('e.category', 'c')
             ->where('p.shareGroup = :group')
@@ -77,4 +77,21 @@ class ExpenseController extends BaseController
         return $this->json($exp[0]);
     }
 
+    /**
+     * @Route("/", name="expense_delete", methods="DELETE")
+     */
+    public function delete(Request $request): Response
+    {
+        $data = $request->getContent();
+
+        $jsonData = json_decode($data, true);
+        $expense = $this->getDoctrine()->getRepository(Expense::class)->find($jsonData['id']);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($expense);
+        $em->flush();
+
+
+        return $this->json(["ok"=>true]);
+    }
 }
